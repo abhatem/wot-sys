@@ -30,6 +30,7 @@ tm_modified_dict = json.loads(tm_string)
 tm_modified_dict["@type"] = config["@type"]
 tm_modified_dict["securityDefinitions"] = config["securityDefinitions"]
 tm_modified_dict["security"] = ["nosec_sc"]
+# TODO: add urdf file link to config.json and add link here
 tm_modified_dict["links"]= [{
 		"rel" : "type",
 		"href" : "",
