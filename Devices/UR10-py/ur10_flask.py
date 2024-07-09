@@ -13,6 +13,7 @@ from flask import Flask, request, abort, redirect, url_for, flash
 from jsonschema import validate
 from sys import exit
 import time
+import math
 
 try:
     from PIL import Image
@@ -60,6 +61,34 @@ else:
 @app.route("/ur10/")
 def thing_description():
     return json.dumps(td), {"Content-Type": "application/json"}
+
+def apply_offset(coordinates, offset):
+    # Apply position offset
+    x = coordinates[0] + offset['position']['x']
+    y = coordinates[1] + offset['position']['y']
+    z = coordinates[2] + offset['position']['z']
+    
+    # Apply rotation offset (this is a simplified rotation - for accurate rotation, consider using rotation matrices or quaternions)
+    rx = coordinates[3] + math.radians(offset['rotation']['rx'])
+    ry = coordinates[4] + math.radians(offset['rotation']['ry'])
+    rz = coordinates[5] + math.radians(offset['rotation']['rz'])
+    
+    return [x, y, z, rx, ry, rz]
+
+@app.route("/ur10/properties/worldCoordinates", methods=["GET"])
+def worldCoordinates():
+    if args.dummy:
+        return json.dumps([0, 0, 0, 0, 0, 0]), 200, {"Content-Type": "application/json"}
+    TCPpose = rtde_r.getActualTCPPose()
+    TCPpose[0] = TCPpose[0] * 1000
+    TCPpose[1] = TCPpose[1] * 1000
+    TCPpose[2] = (TCPpose[2] - 0.4) * 1000
+    world_pose = apply_offset(TCPpose, config["offset"])
+    return json.dumps(world_pose), 200, {"Content-Type": "application/json"}
+
+@app.route("/ur10/properties/offset", methods=["GET"])
+def get_offset():
+    return json.dumps(config["offset"]), 200, {"Content-Type": "application/json"}
 
 @app.route("/ur10/properties/homePosition", methods=["GET"])
 def homePosition():

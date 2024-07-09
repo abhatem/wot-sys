@@ -5,14 +5,12 @@
   "goHome": {
    "description": "Go to the home position",
    "forms": [
-    [
-     {
-      "contentType": "application/json",
-      "href": "actions/goHome",
-      "htv:methodName": "POST",
-      "op": "invokeaction"
-     }
-    ]
+    {
+     "contentType": "application/json",
+     "href": "actions/goHome",
+     "htv:methodName": "POST",
+     "op": "invokeaction"
+    }
    ],
    "idempotent": false,
    "safe": false,
@@ -21,14 +19,12 @@
   "setJointDegrees": {
    "description": "Turn the robot arm joints to a specific degree",
    "forms": [
-    [
-     {
-      "contentType": "application/json",
-      "href": "actions/setJointDegrees",
-      "htv:methodName": "POST",
-      "op": "invokeaction"
-     }
-    ]
+    {
+     "contentType": "application/json",
+     "href": "actions/setJointDegrees",
+     "htv:methodName": "POST",
+     "op": "invokeaction"
+    }
    ],
    "idempotent": true,
    "input": {
@@ -113,14 +109,12 @@
   "turnBase": {
    "description": "Turn the robot arm Base joint a certain amount within borders",
    "forms": [
-    [
-     {
-      "contentType": "application/json",
-      "href": "actions/turnBase",
-      "htv:methodName": "POST",
-      "op": "invokeaction"
-     }
-    ]
+    {
+     "contentType": "application/json",
+     "href": "actions/turnBase",
+     "htv:methodName": "POST",
+     "op": "invokeaction"
+    }
    ],
    "idempotent": false,
    "input": {
@@ -142,14 +136,12 @@
   "turnElbow": {
    "description": "Turn the robot arm elbow joint a certain amount within borders",
    "forms": [
-    [
-     {
-      "contentType": "application/json",
-      "href": "actions/turnElbow",
-      "htv:methodName": "POST",
-      "op": "invokeaction"
-     }
-    ]
+    {
+     "contentType": "application/json",
+     "href": "actions/turnElbow",
+     "htv:methodName": "POST",
+     "op": "invokeaction"
+    }
    ],
    "idempotent": false,
    "input": {
@@ -171,14 +163,12 @@
   "turnShoulder": {
    "description": "Turn the robot arm shoulder joint a certain amount within borders",
    "forms": [
-    [
-     {
-      "contentType": "application/json",
-      "href": "actions/turnShoulder",
-      "htv:methodName": "POST",
-      "op": "invokeaction"
-     }
-    ]
+    {
+     "contentType": "application/json",
+     "href": "actions/turnShoulder",
+     "htv:methodName": "POST",
+     "op": "invokeaction"
+    }
    ],
    "idempotent": false,
    "input": {
@@ -200,14 +190,12 @@
   "turnWrist1": {
    "description": "Turn the robot arm Wrist1 joint a certain amount within borders",
    "forms": [
-    [
-     {
-      "contentType": "application/json",
-      "href": "actions/turnWrist1",
-      "htv:methodName": "POST",
-      "op": "invokeaction"
-     }
-    ]
+    {
+     "contentType": "application/json",
+     "href": "actions/turnWrist1",
+     "htv:methodName": "POST",
+     "op": "invokeaction"
+    }
    ],
    "idempotent": false,
    "input": {
@@ -229,14 +217,12 @@
   "turnWrist2": {
    "description": "Turn the robot arm Wrist2 joint a certain amount within borders",
    "forms": [
-    [
-     {
-      "contentType": "application/json",
-      "href": "actions/turnWrist2",
-      "htv:methodName": "POST",
-      "op": "invokeaction"
-     }
-    ]
+    {
+     "contentType": "application/json",
+     "href": "actions/turnWrist2",
+     "htv:methodName": "POST",
+     "op": "invokeaction"
+    }
    ],
    "idempotent": false,
    "input": {
@@ -258,14 +244,12 @@
   "turnWrist3": {
    "description": "Turn the robot arm Wrist3 joint a certain amount within borders",
    "forms": [
-    [
-     {
-      "contentType": "application/json",
-      "href": "actions/turnWrist3",
-      "htv:methodName": "POST",
-      "op": "invokeaction"
-     }
-    ]
+    {
+     "contentType": "application/json",
+     "href": "actions/turnWrist3",
+     "htv:methodName": "POST",
+     "op": "invokeaction"
+    }
    ],
    "idempotent": false,
    "input": {
@@ -343,9 +327,8 @@
  "id": "de:tum:ei:esi:ur10",
  "links": [
   {
-   "href": "",
-   "rel": "type",
-   "type": "application/td+json"
+   "href": "http://127.0.0.1:5000/files/urdf.zip",
+   "rel": "urdfFile"
   }
  ],
  "properties": {
@@ -536,6 +519,57 @@
    "type": "number",
    "writeOnly": false
   },
+  "offset": {
+   "description": "Offset of the robot base from the QR code position",
+   "forms": [
+    {
+     "contentType": "application/json",
+     "href": "properties/offset",
+     "op": [
+      "readproperty"
+     ]
+    }
+   ],
+   "properties": {
+    "position": {
+     "properties": {
+      "x": {
+       "description": "X-axis offset in millimeters",
+       "type": "number"
+      },
+      "y": {
+       "description": "Y-axis offset in millimeters",
+       "type": "number"
+      },
+      "z": {
+       "description": "Z-axis offset in millimeters",
+       "type": "number"
+      }
+     },
+     "type": "object"
+    },
+    "rotation": {
+     "properties": {
+      "rx": {
+       "description": "Rotation offset around X-axis in degrees",
+       "type": "number"
+      },
+      "ry": {
+       "description": "Rotation offset around Y-axis in degrees",
+       "type": "number"
+      },
+      "rz": {
+       "description": "Rotation offset around Z-axis in degrees",
+       "type": "number"
+      }
+     },
+     "type": "object"
+    }
+   },
+   "readOnly": true,
+   "title": "Robot Base Offset",
+   "type": "object"
+  },
   "urdfFile": {
    "description": "URL to download the URDF file for the robot",
    "forms": [
@@ -550,6 +584,55 @@
    "readOnly": true,
    "title": "URDF File",
    "type": "string"
+  },
+  "worldCoordinates": {
+   "description": "Current TCP location in the world coordinate system (relative to QR code)",
+   "forms": [
+    {
+     "contentType": "application/json",
+     "href": "properties/worldCoordinates",
+     "op": [
+      "readproperty"
+     ]
+    }
+   ],
+   "properties": {
+    "rx": {
+     "description": "Rotation around X-axis in degrees",
+     "type": "number"
+    },
+    "ry": {
+     "description": "Rotation around Y-axis in degrees",
+     "type": "number"
+    },
+    "rz": {
+     "description": "Rotation around Z-axis in degrees",
+     "type": "number"
+    },
+    "x": {
+     "description": "X coordinate in millimeters",
+     "type": "number"
+    },
+    "y": {
+     "description": "Y coordinate in millimeters",
+     "type": "number"
+    },
+    "z": {
+     "description": "Z coordinate in millimeters",
+     "type": "number"
+    }
+   },
+   "readOnly": true,
+   "required": [
+    "x",
+    "y",
+    "z",
+    "rx",
+    "ry",
+    "rz"
+   ],
+   "title": "World Coordinates",
+   "type": "object"
   }
  },
  "security": [
