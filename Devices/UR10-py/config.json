@@ -32,5 +32,17 @@
     "MAX_Z_MOVEMENT":2600,
     "robotIP":"172.16.1.130",
     "routerIP": "172.16.1.1",
-    "routerPort":80
+    "routerPort":80,
+    "offset": {
+        "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "rotation": {
+            "rx": 0,
+            "ry": 0,
+            "rz": 0
+        }
+    }
 }

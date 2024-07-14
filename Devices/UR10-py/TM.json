@@ -168,8 +168,8 @@
       "readOnly": true
     },
     "offset": {
-      "title": "Robot Base Offset",
-      "description": "Offset of the robot base from the QR code position",
+      "title": "Robot Base Offset using Unity's (Hololens) coordinate frame",
+      "description": "Offset of the robot base from the QR code position, using Unity's coordinate frame",
       "type": "object",
       "properties": {
         "position": {
@@ -177,15 +177,15 @@
           "properties": {
             "x": { 
               "type": "number",
-              "description": "X-axis offset in millimeters"
+              "description": "X-axis offset in meters"
             },
             "y": { 
               "type": "number",
-              "description": "Y-axis offset in millimeters"
+              "description": "Y-axis offset in meters"
             },
             "z": { 
               "type": "number",
-              "description": "Z-axis offset in millimeters"
+              "description": "Z-axis offset in meters"
             }
           }
         },
