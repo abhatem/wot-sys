@@ -33,6 +33,14 @@
     "robotIP":"172.16.1.130",
     "routerIP": "172.16.1.1",
     "routerPort":80,
+    "jointConfiguration": [
+        {"offset": 0, "direction": 1, "min": -360, "max": 360},
+        {"offset": -90, "direction": 1, "min": -360, "max": 360},
+        {"offset": 0, "direction": 1, "min": -360, "max": 360},
+        {"offset": -90, "direction": 1, "min": -360, "max": 360},
+        {"offset": 0, "direction": 1, "min": -360, "max": 360},
+        {"offset": 0, "direction": 1, "min": -360, "max": 360}
+    ],
     "offset": {
         "position": {
             "x": 0,

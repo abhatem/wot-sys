@@ -24,7 +24,8 @@ except ImportError:
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description="UR10 Flask Server")
-parser.add_argument('--dummy', action='store_true', help="Run in dummy mode without connecting to the robot")
+parser.add_argument('--dummy', action='store_true',
+                    help="Run in dummy mode without connecting to the robot")
 args = parser.parse_args()
 
 # ---------------- CONFIG ----------------
@@ -58,24 +59,32 @@ else:
     rtde_r = None
     rtde_io_ = None
 
+
 @app.route("/ur10/")
 def thing_description():
     return json.dumps(td), {"Content-Type": "application/json"}
+
+
+@app.route("/ur10/properties/jointConfiguration", methods=["GET"])
+def jointConfiguration():
+    return json.dumps({"jointConfiguration": config["jointConfiguration"]}), 200, {"Content-Type": "application/json"}
+
 
 def apply_offset(coordinates, offset):
     # Apply position offset
     x = coordinates[0] + offset['position']['x']
     y = coordinates[1] + offset['position']['y']
     z = coordinates[2] + offset['position']['z']
-    
+
     # Apply rotation offset (this is a simplified rotation - for accurate rotation, consider using rotation matrices or quaternions)
     rx = coordinates[3] + math.radians(offset['rotation']['rx'])
     ry = coordinates[4] + math.radians(offset['rotation']['ry'])
     rz = coordinates[5] + math.radians(offset['rotation']['rz'])
-    
+
     return [x, y, z, rx, ry, rz]
 
-@app.route("/ur10/properties/worldCoordinates", methods=["GET"])
+
+@ app.route("/ur10/properties/worldCoordinates", methods=["GET"])
 def worldCoordinates():
     if args.dummy:
         return json.dumps([0, 0, 0, 0, 0, 0]), 200, {"Content-Type": "application/json"}
@@ -86,16 +95,19 @@ def worldCoordinates():
     world_pose = apply_offset(TCPpose, config["offset"])
     return json.dumps(world_pose), 200, {"Content-Type": "application/json"}
 
-@app.route("/ur10/properties/offset", methods=["GET"])
+
+@ app.route("/ur10/properties/offset", methods=["GET"])
 def get_offset():
     return json.dumps(config["offset"]), 200, {"Content-Type": "application/json"}
 
-@app.route("/ur10/properties/homePosition", methods=["GET"])
+
+@ app.route("/ur10/properties/homePosition", methods=["GET"])
 def homePosition():
     x = json.dumps(HOMELOCATION)
     return x, 200, {"Content-Type": "application/json"}
 
-@app.route("/ur10/properties/currentCoordinates", methods=["GET"])
+
+@ app.route("/ur10/properties/currentCoordinates", methods=["GET"])
 def currentCoordinates():
     if args.dummy:
         return json.dumps([0, 0, 0, 0, 0, 0]), 200, {"Content-Type": "application/json"}
@@ -105,7 +117,8 @@ def currentCoordinates():
     TCPpose[2] = (TCPpose[2] - 0.4) * 1000
     return json.dumps(TCPpose), 200, {"Content-Type": "application/json"}
 
-@app.route("/ur10/properties/currentJointDegrees", methods=["GET"])
+
+@ app.route("/ur10/properties/currentJointDegrees", methods=["GET"])
 def currentJointDegrees():
     if args.dummy:
         return json.dumps([0, 0, 0, 0, 0, 0]), 200, {"Content-Type": "application/json"}
@@ -114,7 +127,8 @@ def currentJointDegrees():
         init_q[i] = init_q[i] * 57.29
     return json.dumps(init_q), 200, {"Content-Type": "application/json"}
 
-@app.route("/ur10/properties/moveSpeed", methods=["GET", "PUT"])
+
+@ app.route("/ur10/properties/moveSpeed", methods=["GET", "PUT"])
 def speed():
     global DEFAULTSPEED
     if request.method == "PUT":
@@ -132,7 +146,8 @@ def speed():
     else:
         return json.dumps(DEFAULTSPEED), 200, {"Content-Type": "application/json"}
 
-@app.route("/ur10/properties/moveAcceleration", methods=["GET", "PUT"])
+
+@ app.route("/ur10/properties/moveAcceleration", methods=["GET", "PUT"])
 def acceleration():
     global DEFAULTACCELERATION
     if request.method == "PUT":
@@ -154,14 +169,14 @@ def acceleration():
             {"Content-Type": "application/json"},
         )
 
-@app.route("/ur10/properties/urdfFile", methods=["GET"])
+
+@ app.route("/ur10/properties/urdfFile", methods=["GET"])
 def urdfFile():
     urdf_url = "http://127.0.0.1:5000/files/ur10_urdf.zip"
     return json.dumps({"url": urdf_url}), 200, {"Content-Type": "application/json"}
 
 
-    
-@app.route("/ur10/actions/goHome", methods=["POST"])
+@ app.route("/ur10/actions/goHome", methods=["POST"])
 def goHome():
     if args.dummy:
         return "", 204
@@ -185,7 +200,8 @@ def goHome():
     else:
         abort(400, "robot is not in Normal mode")
 
-@app.route("/ur10/actions/turnBase", methods=["POST"])
+
+@ app.route("/ur10/actions/turnBase", methods=["POST"])
 def turnBase():
     if args.dummy:
         return "", 204
@@ -201,7 +217,8 @@ def turnBase():
         new_q[0] += degree / 57.29
         status = rtde_r.getRobotStatus()
         if status >= 1:
-            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED, DEFAULTACCELERATION, False)
+            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED,
+                                  DEFAULTACCELERATION, False)
             if isDone:
                 return "", 204
             else:
@@ -211,7 +228,8 @@ def turnBase():
     else:
         abort(415, "Error 415")
 
-@app.route("/ur10/actions/turnShoulder", methods=["POST"])
+
+@ app.route("/ur10/actions/turnShoulder", methods=["POST"])
 def turnShoulder():
     if args.dummy:
         return "", 204
@@ -228,7 +246,8 @@ def turnShoulder():
         status = rtde_r.getRobotStatus()
         print(status)
         if status >= 1:
-            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED, DEFAULTACCELERATION, False)
+            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED,
+                                  DEFAULTACCELERATION, False)
             if isDone:
                 return "", 204
             else:
@@ -240,7 +259,8 @@ def turnShoulder():
         return "Error 415"
         abort(415)
 
-@app.route("/ur10/actions/turnElbow", methods=["POST"])
+
+@ app.route("/ur10/actions/turnElbow", methods=["POST"])
 def turnElbow():
     if args.dummy:
         return "", 204
@@ -257,7 +277,8 @@ def turnElbow():
         new_q[2] += degree / 57.29
         status = rtde_r.getRobotStatus()
         if status >= 1:
-            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED, DEFAULTACCELERATION, False)
+            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED,
+                                  DEFAULTACCELERATION, False)
             if isDone:
                 return "", 204
             else:
@@ -267,7 +288,8 @@ def turnElbow():
     else:
         abort(415, "Error 415")
 
-@app.route("/ur10/actions/turnWrist1", methods=["POST"])
+
+@ app.route("/ur10/actions/turnWrist1", methods=["POST"])
 def turnWrist1():
     if args.dummy:
         return "", 204
@@ -281,10 +303,11 @@ def turnWrist1():
         print((type(degree)))
         init_q = rtde_r.getActualQ()
         new_q = init_q[:]
-        new_q[3] += degree /         57.29
+        new_q[3] += degree / 57.29
         status = rtde_r.getRobotStatus()
         if status >= 1:
-            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED, DEFAULTACCELERATION, False)
+            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED,
+                                  DEFAULTACCELERATION, False)
             if isDone:
                 return "", 204
             else:
@@ -294,7 +317,8 @@ def turnWrist1():
     else:
         abort(415, "Error 415")
 
-@app.route("/ur10/actions/turnWrist2", methods=["POST"])
+
+@ app.route("/ur10/actions/turnWrist2", methods=["POST"])
 def turnWrist2():
     if args.dummy:
         return "", 204
@@ -311,7 +335,8 @@ def turnWrist2():
         new_q[4] += degree / 57.29
         status = rtde_r.getRobotStatus()
         if status >= 1:
-            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED, DEFAULTACCELERATION, False)
+            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED,
+                                  DEFAULTACCELERATION, False)
             if isDone:
                 return "", 204
             else:
@@ -321,7 +346,8 @@ def turnWrist2():
     else:
         abort(415, "Error 415")
 
-@app.route("/ur10/actions/turnWrist3", methods=["POST"])
+
+@ app.route("/ur10/actions/turnWrist3", methods=["POST"])
 def turnWrist3():
     if args.dummy:
         return "", 204
@@ -339,7 +365,8 @@ def turnWrist3():
         new_q[5] += degree / 57.29
         status = rtde_r.getRobotStatus()
         if status >= 1:
-            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED, DEFAULTACCELERATION, False)
+            isDone = rtde_c.moveJ(new_q, DEFAULTSPEED,
+                                  DEFAULTACCELERATION, False)
             if isDone:
                 return "", 204
             else:
@@ -349,7 +376,8 @@ def turnWrist3():
     else:
         abort(415, "Error 415")
 
-@app.route("/ur10/actions/setJointDegrees", methods=["POST"])
+
+@ app.route("/ur10/actions/setJointDegrees", methods=["POST"])
 def setJointDegrees():
     if args.dummy:
         return "", 204
@@ -362,7 +390,7 @@ def setJointDegrees():
         schema = td["actions"]["setJointDegrees"]["input"]
         try:
             validate(instance=request.json, schema=schema)
-            if(type(request.json) == dict):
+            if (type(request.json) == dict):
                 for key in request.json.keys():
                     if key == "base":
                         jointList[0] = request.json["base"] / 57.29
@@ -378,9 +406,10 @@ def setJointDegrees():
                         jointList[5] = request.json["wrist3"] / 57.29
                     elif key == "async":
                         asyn = request.json["async"]
-            elif(type(request.json) == list):
+            elif (type(request.json) == list):
                 for i in range(6):
-                    jointList[i] = request.json[i] / 57.29 # convert to radians
+                    jointList[i] = request.json[i] / \
+                        57.29  # convert to radians
             print(jointList)
             init_q = rtde_r.getActualQ()
             print(init_q)
@@ -393,7 +422,8 @@ def setJointDegrees():
             if status >= 1:
                 new_q = init_q[:]
                 print(new_q)
-                isDone = rtde_c.moveJ(new_q, DEFAULTSPEED, DEFAULTACCELERATION, asyn)
+                isDone = rtde_c.moveJ(
+                    new_q, DEFAULTSPEED, DEFAULTACCELERATION, asyn)
                 if isDone:
                     return "", 204
                 else:
@@ -406,7 +436,8 @@ def setJointDegrees():
     else:
         abort(415, "Error 415")
 
-@app.route("/ur10/actions/goTo", methods=["POST"])
+
+@ app.route("/ur10/actions/goTo", methods=["POST"])
 def goTo():
     if args.dummy:
         return "", 204
@@ -453,7 +484,8 @@ def goTo():
         print(new_q)
         status = rtde_r.getRobotStatus()
         if status >= 1:
-            isDone = rtde_c.moveJ_IK(new_q, DEFAULTSPEED, DEFAULTACCELERATION, asyn)
+            isDone = rtde_c.moveJ_IK(
+                new_q, DEFAULTSPEED, DEFAULTACCELERATION, asyn)
             if isDone:
                 TCPpose = rtde_r.getActualTCPPose()
                 TCPpose[0] = TCPpose[0] * 1000
@@ -471,21 +503,24 @@ def goTo():
     else:
         abort(415, "Error 415")
 
-@app.route("/ur10/actions/gripClose", methods=["POST"])
+
+@ app.route("/ur10/actions/gripClose", methods=["POST"])
 def gripClose():
     if args.dummy:
         return "", 204
     rtde_io_.setStandardDigitalIn(0, False)
     return "", 204
 
-@app.route("/ur10/actions/gripCloseLight", methods=["POST"])
+
+@ app.route("/ur10/actions/gripCloseLight", methods=["POST"])
 def gripCloseLight():
     if args.dummy:
         return "", 204
     print(f"dirs: {dir(rtde_io_)}")
     return "", 204
 
-@app.route("/ur10/actions/gripOpen", methods=["POST"])
+
+@ app.route("/ur10/actions/gripOpen", methods=["POST"])
 def gripOpen():
     if args.dummy:
         return "", 204
@@ -496,6 +531,7 @@ def gripOpen():
     rtde_io_.setStandardDigitalOut(3, False)
     rtde_io_.setStandardDigitalOut(0, False)
     return "", 204
+
 
 def submit_td(tdd_address):
     global td
@@ -514,6 +550,7 @@ def submit_td(tdd_address):
         except Exception as e:
             time.sleep(45)
 
+
 if not args.dummy:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -524,4 +561,3 @@ if not args.dummy:
             time.sleep(5)
 
 app.run(host="0.0.0.0", port=8080)
-

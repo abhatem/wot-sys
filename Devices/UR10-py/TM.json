@@ -167,6 +167,39 @@
       },
       "readOnly": true
     },
+
+    "jointConfiguration": {
+        "title": "Joint Configuration",
+        "description": "Configuration for joint offsets, directions, and limits",
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "offset": {
+                    "type": "number",
+                    "description": "Offset angle in degrees for the joint"
+                },
+                "direction": {
+                    "type": "number",
+                    "enum": [1, -1],
+                    "description": "Direction multiplier (1 for same, -1 for reversed)"
+                },
+                "min": {
+                    "type": "number",
+                    "description": "Minimum angle in degrees for the joint"
+                },
+                "max": {
+                    "type": "number",
+                    "description": "Maximum angle in degrees for the joint"
+                }
+            },
+            "required": ["offset", "direction", "min", "max"]
+        },
+        "minItems": 6,
+        "maxItems": 6,
+        "readOnly": true
+    },
+
     "offset": {
       "title": "Robot Base Offset using Unity's (Hololens) coordinate frame",
       "description": "Offset of the robot base from the QR code position, using Unity's coordinate frame",
