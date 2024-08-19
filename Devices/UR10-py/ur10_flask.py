@@ -50,10 +50,52 @@ HOMELOCATION = constants["HOMELOCATION"]
 app = Flask(__name__)
 
 # Initialize robot interfaces only if not in dummy mode
-if not args.dummy:
+
+rtde_c = None
+rtde_r = None
+rtde_io_ = None
+
+
+def initialize_robot_interfaces():
+    global rtde_c
+    global rtde_r
+    global rtde_io_
     rtde_c = RTDEControl(config["robotIP"])
     rtde_r = RTDEReceive(config["robotIP"])
     rtde_io_ = RTDEIO(config["robotIP"])
+
+
+def close_robot_interfaces():
+    global rtde_c
+    global rtde_r
+    global rtde_io_
+
+    try:
+        if rtde_c is not None:
+            rtde_c.stopScript()  # Stop any running script on the controller
+            rtde_c.disconnect()  # Disconnect the RTDE Control interface
+            rtde_c = None  # Clear the reference
+
+        if rtde_r is not None:
+            rtde_r.disconnect()  # Disconnect the RTDE Receive interface
+            rtde_r = None  # Clear the reference
+
+        # No disconnect for rtde_io_ since it doesn't have a disconnect method
+        rtde_io_ = None  # Just clear the reference
+
+        print("Robot interfaces successfully closed.")
+    except Exception as e:
+        print(f"Error while closing robot interfaces: {e}")
+
+
+
+def reinitialize_robot_interfaces():
+    close_robot_interfaces()  # Close existing interfaces
+    time.sleep(1)  # Short delay to ensure resources are released
+    initialize_robot_interfaces()  # Reinitialize the interfaces
+
+if not args.dummy:
+    initialize_robot_interfaces()
 else:
     rtde_c = None
     rtde_r = None
@@ -382,6 +424,8 @@ def setJointDegrees():
     if args.dummy:
         return "", 204
     print(request.json)
+
+    global rtde_c
     if request.is_json:
         print(request.json)
         jointList = [None] * 6
@@ -410,8 +454,11 @@ def setJointDegrees():
                 for i in range(6):
                     jointList[i] = request.json[i] / \
                         57.29  # convert to radians
+            print("jointList:")
             print(jointList)
+
             init_q = rtde_r.getActualQ()
+            print("init_q:")
             print(init_q)
             for i in range(6):
                 if not jointList[i] == None:
@@ -421,14 +468,37 @@ def setJointDegrees():
             status = rtde_r.getRobotStatus()
             if status >= 1:
                 new_q = init_q[:]
+                print("new_q:")
                 print(new_q)
+
                 isDone = rtde_c.moveJ(
                     new_q, DEFAULTSPEED, DEFAULTACCELERATION, asyn)
+                if not isDone:
+                    # try with Reinitializing
+                    reinitialize_robot_interfaces()
+                    isDone = rtde_c.moveJ(
+                        new_q, DEFAULTSPEED, DEFAULTACCELERATION, asyn)
+
                 if isDone:
                     return "", 204
                 else:
-                    abort(400, "Couldn't perform")
+                    abort(400, "Couldn't perform after retry")
+                # isDone = rtde_c.moveJ(
+                #     new_q, DEFAULTSPEED, DEFAULTACCELERATION, asyn)
+                # if isDone:
+                #     return "", 204
+                # else:
+                #     rtde_c = RTDEControl(config["robotIP"])
+                #     isDone = rtde_c.moveJ(
+                #         new_q, DEFAULTSPEED, DEFAULTACCELERATION, asyn)
+                #     if isDone:
+                #         return "", 204
+                #     else:
+                #         abort(400, "Couldn't perform")
             else:
+                print("robot is not in Normal mode")
+                print(rtde_r.getRobotStatus())
+                print(rtde_c.getRobotStatus())
                 abort(400, "robot is not in Normal mode")
         except Exception as e:
             print(e)
