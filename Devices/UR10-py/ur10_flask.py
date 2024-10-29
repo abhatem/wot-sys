@@ -498,7 +498,7 @@ def setJointDegrees():
             else:
                 print("robot is not in Normal mode")
                 print(rtde_r.getRobotStatus())
-                print(rtde_c.getRobotStatus())
+                # print(rtde_c.getRobotStatus())
                 abort(400, "robot is not in Normal mode")
         except Exception as e:
             print(e)
